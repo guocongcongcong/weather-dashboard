@@ -16,7 +16,6 @@ interface Particle {
   maxAge: number;
 }
 
-// Generate a pseudo-realistic global-ish wind grid using sinusoidal patterns
 function generateWindGrid(
   lat: number,
   lon: number,
@@ -48,15 +47,11 @@ function generateWindGrid(
 
       const dlat = glat - lat;
       const dlon = glon - lon;
-
-      // Coriolis-like swirl + base wind
       const dist = Math.sqrt(dlat * dlat + dlon * dlon) * 100;
       const angle = Math.atan2(dlat, dlon);
       const swirlStrength = Math.min(3, 15 / (dist + 1));
       const uSwirl = -Math.sin(angle) * swirlStrength * (dlat > 0 ? 1 : -1);
       const vSwirl = Math.cos(angle) * swirlStrength * (dlat > 0 ? 1 : -1);
-
-      // Add some waviness
       const wave = Math.sin(glat * 0.5) * Math.cos(glon * 0.3) * 2;
 
       const idx = r * cols + c;
@@ -113,7 +108,6 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
     };
   }, [data.lat, data.lon]);
 
-  // Generate wind data
   useEffect(() => {
     windGridRef.current = generateWindGrid(
       data.lat,
@@ -124,7 +118,6 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
     particlesRef.current = initParticles(800);
   }, [data, initParticles]);
 
-  // Wind particle animation
   useEffect(() => {
     const canvas = canvasRef.current;
     const leafletMap = mapRef.current;
@@ -170,11 +163,9 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Convert normalized position to lat/lon
         const plat = north - p.y * latRange;
         const plon = west + p.x * lonRange;
 
-        // Find wind vector by bilinear interpolation in the grid
         const windLatIdx =
           ((plat - wind.lats[0]) / (wind.lats[wind.lats.length - 1] - wind.lats[0])) *
           (wind.rows - 1);
@@ -190,51 +181,50 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
         const fr = windLatIdx - r0;
         const fc = windLonIdx - c0;
 
+        const idx00 = r0 * wind.cols + c0;
+        const idx01 = r0 * wind.cols + c1;
+        const idx10 = r1 * wind.cols + c0;
+        const idx11 = r1 * wind.cols + c1;
+
         const u =
-          (1 - fr) * (1 - fc) * wind.u[r0 * wind.cols + c0] +
-          (1 - fr) * fc * wind.u[r0 * wind.cols + c1] +
-          fr * (1 - fc) * wind.u[r1 * wind.cols + c0] +
-          fr * fc * wind.u[r1 * wind.cols + c1];
+          (1 - fr) * (1 - fc) * wind.u[idx00] +
+          (1 - fr) * fc * wind.u[idx01] +
+          fr * (1 - fc) * wind.u[idx10] +
+          fr * fc * wind.u[idx11];
 
         const v =
-          (1 - fr) * (1 - fc) * wind.v[r0 * wind.cols + c0] +
-          (1 - fr) * fc * wind.v[r0 * wind.cols + c1] +
-          fr * (1 - fc) * wind.v[r1 * wind.cols + c0] +
-          fr * fc * wind.v[r1 * wind.cols + c1];
+          (1 - fr) * (1 - fc) * wind.v[idx00] +
+          (1 - fr) * fc * wind.v[idx01] +
+          fr * (1 - fc) * wind.v[idx10] +
+          fr * fc * wind.v[idx11];
 
-        // Move particle (scale wind speed to screen movement)
         const scale = 0.00003 * dt;
         p.x += u * scale;
         p.y += v * scale;
         p.age += dt;
 
-        // Wrap around
         if (p.x < 0) p.x = 1;
         if (p.x > 1) p.x = 0;
         if (p.y < 0) p.y = 1;
         if (p.y > 1) p.y = 0;
 
-        // Reset old particles
         if (p.age > p.maxAge) {
           p.age = 0;
           p.x = Math.random();
           p.y = Math.random();
         }
 
-        // Draw particle
         const alpha = p.age < 5 ? p.age / 5 : p.age > p.maxAge - 10 ? (p.maxAge - p.age) / 10 : 1;
         const screenX = p.x * w;
         const screenY = p.y * h;
 
-        // Skip off-screen
         if (screenX < -5 || screenX > w + 5 || screenY < -5 || screenY > h + 5) continue;
 
         ctx.beginPath();
         ctx.arc(screenX, screenY, 1.2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.7})`;
+        ctx.fillStyle = `rgba(148, 163, 184, ${alpha * 0.8})`;
         ctx.fill();
 
-        // Draw trail
         const trailLen = 4;
         const trailU = u * scale * trailLen;
         const trailV = v * scale * trailLen;
@@ -242,7 +232,7 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
         ctx.beginPath();
         ctx.moveTo(screenX, screenY);
         ctx.lineTo(screenX - trailU, screenY - trailV);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
+        ctx.strokeStyle = `rgba(148, 163, 184, ${alpha * 0.4})`;
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -263,37 +253,56 @@ export default function WindFieldView({ data, onCitySelect }: WindFieldViewProps
   const windDir = windDirectionText(data.current.windDirection);
 
   return (
-    <div className="relative min-h-screen bg-slate-900">
-      {/* Map container */}
-      <div ref={mapContainerRef} className="absolute inset-0 z-0" />
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-10 pointer-events-none"
-      />
-
-      {/* Info overlay */}
-      <div className="relative z-20 pt-16 px-4 max-w-5xl mx-auto pointer-events-none">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 pointer-events-auto">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight drop-shadow-lg">
-            风场视图
-          </h1>
+    <div className="min-h-screen bg-[#F7F8FA] pt-12">
+      <div className="max-w-6xl mx-auto px-6 pt-6 pb-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4 animate-fade-in">
+          <div>
+            <h1 className="text-lg font-semibold text-[#1A1D23]">Wind Field</h1>
+            <p className="text-xs text-[#9CA3AF]">{data.city} · real-time wind patterns</p>
+          </div>
           <CitySearch currentCity={data.city} onSelect={onCitySelect} />
         </div>
 
-        <div className="glass rounded-2xl px-5 py-3 inline-flex items-center gap-6 text-white pointer-events-auto">
-          <div>
-            <span className="text-white/50 text-xs">风速</span>
-            <div className="text-xl font-bold">{data.current.windSpeed.toFixed(1)} km/h</div>
-          </div>
-          <div className="w-px h-8 bg-white/10" />
-          <div>
-            <span className="text-white/50 text-xs">风向</span>
-            <div className="text-xl font-bold">{windDir} {data.current.windDirection}°</div>
-          </div>
-          <div className="w-px h-8 bg-white/10" />
-          <div>
-            <span className="text-white/50 text-xs">阵风</span>
-            <div className="text-xl font-bold">{(data.current.windSpeed * 1.3).toFixed(1)} km/h</div>
+        {/* Map card */}
+        <div className="card overflow-hidden mb-4 animate-fade-in delay-2 relative" style={{ height: '480px' }}>
+          <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 z-10 pointer-events-none"
+            style={{ borderRadius: '16px' }}
+          />
+        </div>
+
+        {/* Data bar */}
+        <div className="card animate-fade-in delay-3">
+          <div className="flex items-center justify-around py-4 px-6">
+            <div className="text-center">
+              <div className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-0.5">
+                Wind Speed
+              </div>
+              <div className="text-xl font-semibold text-[#1A1D23]">
+                {data.current.windSpeed.toFixed(1)} <span className="text-sm text-[#9CA3AF] font-normal">km/h</span>
+              </div>
+            </div>
+            <div className="w-px h-10 bg-[#E2E4E9]" />
+            <div className="text-center">
+              <div className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-0.5">
+                Direction
+              </div>
+              <div className="text-xl font-semibold text-[#1A1D23]">
+                {windDir} <span className="text-sm text-[#9CA3AF] font-normal">{data.current.windDirection}°</span>
+              </div>
+            </div>
+            <div className="w-px h-10 bg-[#E2E4E9]" />
+            <div className="text-center">
+              <div className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-0.5">
+                Gusts
+              </div>
+              <div className="text-xl font-semibold text-[#1A1D23]">
+                {(data.current.windSpeed * 1.3).toFixed(1)} <span className="text-sm text-[#9CA3AF] font-normal">km/h</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -14,60 +14,72 @@ export default function MinimalWeatherCard({ data, onCitySelect }: MinimalWeathe
   const info = getWeatherInfo(data.current.weatherCode);
   const windDir = windDirectionText(data.current.windDirection);
 
-  const sunrise = data.daily.sunrise[0]?.slice(11, 16) || '--:--';
-  const sunset = data.daily.sunset[0]?.slice(11, 16) || '--:--';
-
   return (
-    <div className={`min-h-screen ${theme.gradient} ${theme.bg} transition-all duration-1000`}>
-      <div className="max-w-lg mx-auto px-4 pt-20 pb-8">
-        {/* City search */}
-        <div className="flex justify-end mb-6 animate-fade-in">
+    <div
+      className="min-h-screen pt-12 transition-all duration-500"
+      style={{ background: theme.ambientBg }}
+    >
+      <div className="max-w-2xl mx-auto px-6 pt-10 pb-12">
+        {/* Search */}
+        <div className="flex justify-end mb-8 animate-fade-in delay-1">
           <CitySearch currentCity={data.city} onSelect={onCitySelect} />
         </div>
 
-        {/* Main card */}
-        <div className="glass rounded-3xl p-8 text-center animate-fade-in shadow-2xl">
-          <div className="text-8xl mb-3">{info.icon}</div>
-          <h1 className="text-2xl font-medium text-white/90 mb-1">{data.city}</h1>
-          <p className="text-white/50 text-sm mb-6">{info.label}</p>
-
-          <div className="text-9xl font-bold text-white tracking-tighter leading-none">
-            {Math.round(data.current.temperature)}°
+        {/* Hero: large centered temperature */}
+        <div className="text-center mb-12 animate-fade-in delay-2">
+          <div className="text-5xl mb-3">{info.icon}</div>
+          <h1 className="text-sm font-medium text-[#9CA3AF] tracking-wide uppercase mb-6">
+            {data.city}
+          </h1>
+          <div className="animate-temp" key={Math.round(data.current.temperature)}>
+            <span className="text-[56px] font-semibold text-[#1A1D23] tracking-tight leading-none">
+              {Math.round(data.current.temperature)}°
+            </span>
           </div>
-          <p className="text-white/50 text-lg mt-2">
-            体感 {Math.round(data.current.feelsLike)}°
+          <p className="text-[#9CA3AF] text-base mt-2">
+            Feels like {Math.round(data.current.feelsLike)}° · {info.label}
           </p>
-
-          {/* Stats row */}
-          <div className="flex items-center justify-center gap-6 mt-6 text-white/70">
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg">💧</span>
-              <span className="text-sm">{data.current.humidity}%</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg">💨</span>
-              <span className="text-sm">{data.current.windSpeed.toFixed(1)} km/h {windDir}</span>
-            </div>
-          </div>
-
-          {/* Extra info */}
-          <div className="flex justify-center gap-6 mt-4 text-white/40 text-xs">
-            <span>🎈 {Math.round(data.current.pressure)} hPa</span>
-            <span>☁️ {data.current.cloudCover}%</span>
-            <span>🌅 {sunrise}</span>
-            <span>🌇 {sunset}</span>
-          </div>
         </div>
 
-        {/* 24h chart */}
-        <div className="glass rounded-3xl p-5 mt-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <h3 className="text-white/70 text-sm font-medium mb-3">24 小时温度趋势</h3>
+        {/* 4 data points */}
+        <div className="grid grid-cols-4 gap-4 mb-8 animate-fade-in delay-3">
+          {[
+            { label: 'Humidity', value: `${data.current.humidity}%` },
+            { label: 'Wind', value: `${data.current.windSpeed.toFixed(1)} km/h` },
+            { label: 'Pressure', value: `${Math.round(data.current.pressure)} hPa` },
+            { label: 'Cloud', value: `${data.current.cloudCover}%` },
+          ].map((item) => (
+            <div key={item.label} className="card card-hover px-4 py-3.5 text-center">
+              <div className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-0.5">
+                {item.label}
+              </div>
+              <div className="text-base font-medium text-[#1A1D23]">
+                {item.value}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Wind direction + extra row */}
+        <div className="flex items-center justify-center gap-6 text-[#9CA3AF] text-xs mb-12 animate-fade-in delay-3">
+          <span>Wind: {windDir} {data.current.windDirection}°</span>
+          <span>Visibility: {(data.current.visibility / 1000).toFixed(1)} km</span>
+          <span>Precip: {data.current.precipitation.toFixed(1)} mm</span>
+        </div>
+
+        {/* 24h temperature chart */}
+        <div className="card p-6 mb-6 animate-fade-in delay-4">
+          <h3 className="text-xs font-medium text-[#9CA3AF] tracking-wider uppercase mb-3">
+            24-Hour Temperature
+          </h3>
           <TemperatureChart hourly={data.hourly} />
         </div>
 
         {/* 5-day forecast */}
-        <div className="mt-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <h3 className="text-white/70 text-sm font-medium mb-3 ml-1">5 日预报</h3>
+        <div className="animate-fade-in delay-5">
+          <h3 className="text-xs font-medium text-[#9CA3AF] tracking-wider uppercase mb-3 ml-1">
+            5-Day Forecast
+          </h3>
           <DailyForecast daily={data.daily} />
         </div>
       </div>

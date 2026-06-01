@@ -78,63 +78,81 @@ export function getWeatherInfo(code: number) {
 }
 
 export function getThemeForWeather(code: number): {
-  bg: string;
-  gradient: string;
-  accent: string;
+  accentBg: string;
+  accentBorder: string;
+  accentText: string;
+  chartColor: string;
+  ambientBg: string;
 } {
   if (code === 0) {
     return {
-      bg: 'from-amber-500 via-orange-400 to-yellow-300',
-      gradient: 'bg-gradient-to-br',
-      accent: '#f59e0b',
+      accentBg: '#FFFBEB',
+      accentBorder: '#FDE68A',
+      accentText: '#92400E',
+      chartColor: '#F59E0B',
+      ambientBg: 'linear-gradient(135deg, #FFFBEB 0%, #FFF7ED 50%, #FFFFFF 100%)',
     };
   }
   if (code <= 2) {
     return {
-      bg: 'from-sky-400 via-blue-400 to-cyan-300',
-      gradient: 'bg-gradient-to-br',
-      accent: '#38bdf8',
+      accentBg: '#EFF6FF',
+      accentBorder: '#BFDBFE',
+      accentText: '#1E40AF',
+      chartColor: '#3B82F6',
+      ambientBg: 'linear-gradient(135deg, #EFF6FF 0%, #F5F9FF 50%, #FFFFFF 100%)',
     };
   }
   if (code === 3) {
     return {
-      bg: 'from-slate-400 via-gray-400 to-zinc-300',
-      gradient: 'bg-gradient-to-br',
-      accent: '#94a3b8',
+      accentBg: '#F3F4F6',
+      accentBorder: '#D1D5DB',
+      accentText: '#374151',
+      chartColor: '#6B7280',
+      ambientBg: 'linear-gradient(135deg, #F3F4F6 0%, #F9FAFB 50%, #FFFFFF 100%)',
     };
   }
   if (code >= 45 && code <= 48) {
     return {
-      bg: 'from-gray-400 via-slate-300 to-gray-200',
-      gradient: 'bg-gradient-to-br',
-      accent: '#9ca3af',
+      accentBg: '#F9FAFB',
+      accentBorder: '#E5E7EB',
+      accentText: '#4B5563',
+      chartColor: '#9CA3AF',
+      ambientBg: 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 50%, #FFFFFF 100%)',
     };
   }
   if (code >= 51 && code <= 82) {
     return {
-      bg: 'from-slate-600 via-blue-800 to-gray-700',
-      gradient: 'bg-gradient-to-b',
-      accent: '#60a5fa',
+      accentBg: '#ECFEFF',
+      accentBorder: '#A5F3FC',
+      accentText: '#155E75',
+      chartColor: '#06B6D4',
+      ambientBg: 'linear-gradient(135deg, #ECFEFF 0%, #F0F9FF 50%, #F8FAFC 100%)',
     };
   }
   if (code >= 71 && code <= 86) {
     return {
-      bg: 'from-blue-100 via-white to-slate-100',
-      gradient: 'bg-gradient-to-br',
-      accent: '#93c5fd',
+      accentBg: '#F0F9FF',
+      accentBorder: '#BAE6FD',
+      accentText: '#075985',
+      chartColor: '#7DD3FC',
+      ambientBg: 'linear-gradient(135deg, #F0F9FF 0%, #F8FAFC 50%, #FFFFFF 100%)',
     };
   }
   if (code >= 95) {
     return {
-      bg: 'from-purple-900 via-indigo-900 to-slate-900',
-      gradient: 'bg-gradient-to-br',
-      accent: '#a78bfa',
+      accentBg: '#FAF5FF',
+      accentBorder: '#D8B4FE',
+      accentText: '#6B21A8',
+      chartColor: '#A855F7',
+      ambientBg: 'linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F8FAFC 100%)',
     };
   }
   return {
-    bg: 'from-sky-400 via-blue-400 to-indigo-400',
-    gradient: 'bg-gradient-to-br',
-    accent: '#38bdf8',
+    accentBg: '#EFF6FF',
+    accentBorder: '#BFDBFE',
+    accentText: '#1E40AF',
+    chartColor: '#3B82F6',
+    ambientBg: 'linear-gradient(135deg, #EFF6FF 0%, #F5F9FF 50%, #FFFFFF 100%)',
   };
 }
 

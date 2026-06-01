@@ -1,7 +1,7 @@
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -30,41 +30,49 @@ export function TemperatureChart({ hourly }: HourlyChartProps) {
     .slice(0, 24);
 
   return (
-    <ResponsiveContainer width="100%" height={120}>
-      <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+    <ResponsiveContainer width="100%" height={140}>
+      <AreaChart data={data} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+        <defs>
+          <linearGradient id="tempGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.15} />
+            <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
         <XAxis
           dataKey="label"
-          tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+          tick={{ fill: '#9CA3AF', fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           interval={3}
         />
         <YAxis
-          tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+          tick={{ fill: '#9CA3AF', fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           domain={['dataMin - 2', 'dataMax + 2']}
+          width={30}
         />
         <Tooltip
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             return (
-              <div className="bg-slate-800/90 backdrop-blur-md border border-white/20 rounded-lg px-3 py-1.5 text-xs text-white">
-                {payload[0]?.payload.label} — {payload[0]?.value}°C
+              <div className="bg-white border border-[#E2E4E9] rounded-lg px-3 py-1.5 text-xs text-[#1A1D23] shadow-md">
+                {payload[0]?.payload.label} — <span className="font-semibold">{payload[0]?.value}°C</span>
               </div>
             );
           }}
         />
-        <Line
+        <Area
           type="monotone"
           dataKey="temp"
-          stroke="rgba(255,255,255,0.8)"
+          stroke="#3B82F6"
           strokeWidth={2}
+          fill="url(#tempGradient)"
           dot={false}
-          activeDot={{ r: 3, fill: '#fff' }}
+          activeDot={{ r: 3, fill: '#3B82F6', stroke: '#fff', strokeWidth: 2 }}
         />
-      </LineChart>
+      </AreaChart>
     </ResponsiveContainer>
   );
 }
@@ -83,33 +91,34 @@ export function PrecipitationChart({ hourly }: HourlyChartProps) {
 
   return (
     <ResponsiveContainer width="100%" height={100}>
-      <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+      <BarChart data={data} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
         <XAxis
           dataKey="label"
-          tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+          tick={{ fill: '#9CA3AF', fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           interval={3}
         />
         <YAxis
-          tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+          tick={{ fill: '#9CA3AF', fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           domain={[0, 100]}
           unit="%"
+          width={32}
         />
         <Tooltip
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             return (
-              <div className="bg-slate-800/90 backdrop-blur-md border border-white/20 rounded-lg px-3 py-1.5 text-xs text-white">
-                {payload[0]?.payload.label} — {payload[0]?.value}% 降水概率
+              <div className="bg-white border border-[#E2E4E9] rounded-lg px-3 py-1.5 text-xs text-[#1A1D23] shadow-md">
+                {payload[0]?.payload.label} — <span className="font-semibold">{payload[0]?.value}%</span> precip
               </div>
             );
           }}
         />
-        <Bar dataKey="precip" fill="rgba(96, 165, 250, 0.6)" radius={[2, 2, 0, 0]} />
+        <Bar dataKey="precip" fill="#06B6D4" radius={[3, 3, 0, 0]} maxBarSize={12} />
       </BarChart>
     </ResponsiveContainer>
   );

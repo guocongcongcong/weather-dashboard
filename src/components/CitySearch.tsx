@@ -55,9 +55,9 @@ export default function CitySearch({ currentCity, onSelect }: CitySearchProps) {
     <div ref={containerRef} className="relative">
       <div className="relative">
         <svg
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none"
         >
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
@@ -69,29 +69,29 @@ export default function CitySearch({ currentCity, onSelect }: CitySearchProps) {
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder={currentCity}
-          className="w-48 pl-9 pr-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-sm
-                     placeholder:text-white/40 focus:outline-none focus:border-white/40 focus:bg-white/15
+          className="w-44 pl-8 pr-3 py-1.5 rounded-lg bg-white border border-[#E2E4E9] text-[#1A1D23] text-sm
+                     placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#D1D5DB] focus:ring-2 focus:ring-[#F3F4F6]
                      transition-all duration-200"
         />
         {searching && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white/70 rounded-full animate-spin" />
+            <div className="w-3 h-3 border-2 border-[#E5E7EB] border-t-[#9CA3AF] rounded-full animate-spin" />
           </div>
         )}
       </div>
 
       {open && (
-        <div className="absolute top-full mt-2 left-0 right-0 bg-slate-800/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+        <div className="absolute top-full mt-1.5 left-0 right-0 bg-white border border-[#E2E4E9] rounded-xl overflow-hidden shadow-lg z-50">
           {results.map((city, i) => (
             <button
               key={`${city.lat}-${city.lon}-${i}`}
               onClick={() => handleSelect(city)}
-              className="w-full px-4 py-3 text-left text-sm text-white/80 hover:bg-white/10 hover:text-white
-                         transition-colors border-b border-white/5 last:border-none cursor-pointer"
+              className="w-full px-4 py-2.5 text-left text-sm text-[#1A1D23] hover:bg-[#F7F8FA]
+                         transition-colors border-b border-[#F3F4F6] last:border-none cursor-pointer"
             >
               <span className="font-medium">{city.name}</span>
-              {city.admin1 && <span className="text-white/40 ml-1">· {city.admin1}</span>}
-              <span className="text-white/30 ml-1">{city.country}</span>
+              {city.admin1 && <span className="text-[#9CA3AF] ml-1">· {city.admin1}</span>}
+              <span className="text-[#D1D5DB] ml-1">{city.country}</span>
             </button>
           ))}
         </div>

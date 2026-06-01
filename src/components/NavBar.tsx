@@ -7,9 +7,9 @@ interface NavBarProps {
 }
 
 const tabs = [
-  { id: 0, label: '极简', icon: '✦' },
-  { id: 1, label: '风场', icon: '🌬' },
-  { id: 2, label: '卫星', icon: '🛰' },
+  { id: 0, label: 'Overview' },
+  { id: 1, label: 'Wind' },
+  { id: 2, label: 'Satellite' },
 ];
 
 export default function NavBar({ activeTab, onTabChange, onRefresh, lastUpdated, loading }: NavBarProps) {
@@ -18,38 +18,47 @@ export default function NavBar({ activeTab, onTabChange, onRefresh, lastUpdated,
     : null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-white/10">
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E2E4E9]">
+      <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
         <div className="flex items-center gap-1">
+          <span className="text-sm font-semibold text-[#1A1D23] tracking-tight mr-4">
+            Weather
+          </span>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+              className={`relative px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-white/20 text-white shadow-lg'
-                  : 'text-white/60 hover:text-white/90 hover:bg-white/10'
+                  ? 'text-[#1A1D23]'
+                  : 'text-[#9CA3AF] hover:text-[#6B7280]'
               }`}
             >
-              <span className="mr-1.5">{tab.icon}</span>
               {tab.label}
+              {activeTab === tab.id && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#1A1D23] rounded-full" />
+              )}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
           {minutesAgo !== null && (
-            <span className="text-xs text-white/50 hidden sm:inline">
-              更新于 {minutesAgo === 0 ? '刚刚' : `${minutesAgo} 分钟前`}
+            <span className="text-xs text-[#9CA3AF] hidden sm:inline tabular-nums">
+              Updated {minutesAgo === 0 ? 'just now' : `${minutesAgo}m ago`}
             </span>
           )}
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
-            title="刷新数据"
+            className="p-1.5 rounded-md hover:bg-[#F3F4F6] transition-colors cursor-pointer disabled:opacity-40"
+            title="Refresh"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-white/70 ${loading ? 'animate-spin' : ''}`}>
+            <svg
+              width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className={`text-[#6B7280] ${loading ? 'animate-spin' : ''}`}
+            >
               <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38" />
             </svg>
           </button>
